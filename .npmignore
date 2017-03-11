@@ -1,0 +1,7 @@
+/node_modules
+/tmp
+/test
+/npm-debug.log
+/deps
+/Makefile
+/exeunt-*.tgz
