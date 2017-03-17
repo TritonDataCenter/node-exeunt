@@ -4,27 +4,10 @@
  * seconds -- assuming that if that is reached that the script has hung.
  */
 
-function softExit(code) {
-    if (code === undefined) {
-        code = 0;
-    }
-
-    var supportsProcessExitCode = true;
-    var nodeVer = process.versions.node.split('.').map(Number);
-    if (nodeVer[0] === 0 && nodeVer[1] <= 10) {
-        supportsProcessExitCode = false;
-    }
-
-    if (supportsProcessExitCode) {
-        process.exitCode = code;
-    } else if (code !== 0) {
-        process.exit(code);
-    }
-}
-
+var exeunt = require('../');
 
 function hardballExit(code) {
-    softExit(code);
+    exeunt.softExit(code);
 
     var timeout = setTimeout(function () {
         process.stderr.write('[meta] hardball exit, you had your chance\n');

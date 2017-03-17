@@ -93,30 +93,10 @@ $ node examples/hang-because-active-handle.js | grep meta
 ^C
 ```
 
-If you need to support node 0.10, [here is a
-snippet](https://github.com/joyent/node-exeunt/blob/master/examples/hardball-after-2s.js#L7-L23)
+If you need to support node 0.10, [here is a `softExit()`
+function](https://github.com/joyent/node-exeunt/blob/master/lib/exeunt.js#L26-56)
 that will use `process.exitCode` if the node version supports it, else fallback
-to `process.exit` if necessary (with the potential for truncation):
-
-```javascript
-function softExit(code) {
-    if (code === undefined) {
-        code = 0;
-    }
-
-    var supportsProcessExitCode = true;
-    var nodeVer = process.versions.node.split('.').map(Number);
-    if (nodeVer[0] === 0 && nodeVer[1] <= 10) {
-        supportsProcessExitCode = false;
-    }
-
-    if (supportsProcessExitCode) {
-        process.exitCode = code;
-    } else if (code !== 0) {
-        process.exit(code);
-    }
-}
-```
+to `process.exit` if necessary (with the potential for truncation).
 
 
 ## Solution 2: give it a few seconds, then play hardball
@@ -217,7 +197,7 @@ $ node examples/write-65k-and-exeunt.js 1000000 | grep meta
 ```
 
 The code, to show what is happening, is here:
-<https://github.com/joyent/node-exeunt/blob/master/lib/exeunt.js#L14-L38>.
+<https://github.com/joyent/node-exeunt/blob/master/lib/exeunt.js#L59-L87>.
 There are some subtleties.
 
 First, we can't just exit synchronously:

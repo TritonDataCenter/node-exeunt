@@ -4,6 +4,8 @@
 # Makefile for node-exeunt
 #
 
+ESLINT = ./node_modules/.bin/eslint
+
 #
 # Targets
 #
@@ -11,13 +13,22 @@
 all:
 	npm install
 
-check:: check-version
+
+check:: check-version check-eslint
 
 # Ensure CHANGES.md and package.json have the same version.
 .PHONY: check-version
 check-version:
 	@echo version is: $(shell cat package.json | json version)
 	[[ `cat package.json | json version` == `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]]
+
+$(ESLINT):
+	npm install
+
+.PHONY: check-eslint
+check-eslint: $(ESLINT)
+	@$< ./
+
 
 .PHONY: cutarelease
 cutarelease: check-version
