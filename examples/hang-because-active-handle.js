@@ -16,6 +16,8 @@ function main() {
     process.stdout.write('[meta] start: writing ' + size + ' bytes...\n');
     process.stdout.write(buff);
     process.stdout.write('\n[meta] done\n');
+
+    process.exitCode = 42;
 }
 
 main();

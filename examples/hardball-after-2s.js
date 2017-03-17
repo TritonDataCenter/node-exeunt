@@ -4,7 +4,7 @@
  * seconds -- assuming that if that is reached that the script has hung.
  */
 
-function hardballExit(code) {
+function softExit(code) {
     if (code === undefined) {
         code = 0;
     }
@@ -20,6 +20,11 @@ function hardballExit(code) {
     } else if (code !== 0) {
         process.exit(code);
     }
+}
+
+
+function hardballExit(code) {
+    softExit(code);
 
     var timeout = setTimeout(function () {
         process.stderr.write('[meta] hardball exit, you had your chance\n');

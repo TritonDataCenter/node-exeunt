@@ -12,7 +12,7 @@ function main() {
     process.stdout.write(buff);
     process.stdout.write('\n[meta] done\n');
 
-    process.exit(0);
+    process.exit(42);
 }
 
 main();

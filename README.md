@@ -23,10 +23,12 @@ var exeunt = require('exeunt');
 function main() {
     // ...
 
-    exeunt();   // flush stdout/stderr and exit
-    return;     // `exeunt` returns, unlike `process.exit`
+    exeunt(code);   // flush stdout/stderr and exit
+    return;         // `exeunt` returns, unlike `process.exit`
 }
 ```
+
+See the [Solution 4](#solution-4-exeunt) section below for details.
 
 Note: `exeunt()` is a small function. If you don't want yet another node
 dependency, then feel free to just copy it to your repo.
@@ -34,12 +36,16 @@ dependency, then feel free to just copy it to your repo.
 
 ## The problem
 
-A node.js script writes a lot of output (such that buffering occurs), and then
-exits. Not all output will be written before the process terminates. E.g.:
+A [node.js
+script](https://github.com/joyent/node-exeunt/blob/master/examples/write-65k-and-exit.js)
+writes a lot of output (such that buffering occurs), [and then
+exits](https://github.com/joyent/node-exeunt/blob/master/examples/write-65k-and-exit.js#L15).
+Not all output will be written before the process terminates. E.g.:
 
 ```
 $ node examples/write-65k-and-exit.js | grep meta
 [meta] start: writing 66560 bytes...
+                                        # 65k of output elided by the `grep`
 [meta] done                             # all output was emitted this time
 
 $ node examples/write-65k-and-exit.js | grep meta
@@ -55,6 +61,7 @@ that output is truncated:
 $ node examples/write-65k-and-exit.js 1000000 | grep meta
 [meta] start: writing 1000000 bytes...
 ```
+
 
 ## Solution 1: avoid process.exit
 
@@ -73,7 +80,8 @@ Cons:
   non-zero exit code without `process.exit(code)`.
 
 
-Example showing an accidental hang on exit:
+[Example](https://github.com/joyent/node-exeunt/blob/master/examples/hang-because-active-handle.js)
+showing an accidental hang on exit:
 
 ```
 $ node examples/hang-because-active-handle.js | grep meta
@@ -85,12 +93,13 @@ $ node examples/hang-because-active-handle.js | grep meta
 ^C
 ```
 
-If you need to support node 0.10, here is a snippet that will use
-`process.exitCode` if the node version supports it, else fallback to
-`process.exit` if necessary (with the potential for truncation).
+If you need to support node 0.10, [here is a
+snippet](https://github.com/joyent/node-exeunt/blob/master/examples/hardball-after-2s.js#L7-L23)
+that will use `process.exitCode` if the node version supports it, else fallback
+to `process.exit` if necessary (with the potential for truncation):
 
 ```javascript
-function softexit(code) {
+function softExit(code) {
     if (code === undefined) {
         code = 0;
     }
@@ -130,7 +139,7 @@ Cons:
   code.
 
 
-Example:
+[Example](https://github.com/joyent/node-exeunt/blob/master/examples/hardball-after-2s.js#L25-L33):
 
 ```
 $ node examples/hardball-after-2s.js | grep meta
@@ -156,7 +165,7 @@ Cons:
   See <https://gist.github.com/misterdjules/3aa4c77d8f881ffccba3b6e6f0050d03>
   for an example showing this. (TODO: include those scripts in examples/ here.)
 
-Example:
+[Example](https://github.com/joyent/node-exeunt/blob/master/examples/set-blocking-write-65k-and-exit.js#L8-L10):
 
 ```
 $ node examples/set-blocking-write-65k-and-exit.js 1000000 | grep meta
@@ -168,6 +177,19 @@ $ node examples/set-blocking-write-65k-and-exit.js 1000000 | grep meta
 ## Solution 4: exeunt
 
 Set stdout/stderr to be blocking, but *only when about to exit*.
+
+Usage:
+
+```javascript
+var exeunt = require('exeunt');
+
+function main() {
+    // ...
+
+    exeunt(code);   // flush stdout/stderr and exit
+    return;         // `exeunt` returns, unlike `process.exit`
+}
+```
 
 Pros:
 - Stdout and stderr will *most likely* (see below) be flushed before exiting.
@@ -186,10 +208,10 @@ Cons:
   for yours.
 
 
-Example:
+[Example](https://github.com/joyent/node-exeunt/blob/master/examples/write-65k-and-exeunt.js#L17):
 
 ```
-$ node write-65k-and-exeunt.js 1000000 | grep meta
+$ node examples/write-65k-and-exeunt.js 1000000 | grep meta
 [meta] start: writing 1000000 bytes...
 [meta] done
 ```
