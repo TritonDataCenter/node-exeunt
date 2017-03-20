@@ -218,12 +218,8 @@ handler](https://github.com/nodejs/node/blob/v4.8.0/deps/uv/src/unix/core.c#L355
 Second, we said that stdout/stderr will "most likely be flushed" above, because
 it appears that [`uv__io_poll` is
 tuned](https://github.com/nodejs/node/blob/v4.8.0/deps/uv/src/unix/kqueue.c#L150)
-to handle a finite number of IO events in a single event loop pass. Currently
-that number is 48. We *believe* that means that if there are more than 48
-IO events (say, a pool of 50 sockets with data to read or write), then it is
-possible that the single event loop pass before exiting will *not* handle
-flushing stdout/stderr. If this is possible for your situation, then this
-"Solution" might not be helpful for you.
+to limit the amount of events if will handle in a single event loop pass. I
+haven't yet come up with example code that hits this threshold, however.
 
 
 ## Open Questions
@@ -234,11 +230,13 @@ known unknowns.
 - We need to verify the observations I've made above. At time of writing I was
   testing out the above examples with node v4.8.0 on macOS 10.11.6.
 
-- Is our quick read of the libuv's `uv__io_poll` (which is called once for each
-  pass through the node event loop) that only 48 events will be serviced in one
-  pass correct?
-    https://github.com/nodejs/node/blob/v4.8.0/deps/uv/src/unix/kqueue.c#L150
-  Test it.
+- What are the conditions in libuv's `uv__io_poll` (which is called once for each
+  pass through the node event loop) such that the `count = 48` guard is
+  triggered, such that not all IO is handled in that last pass?
+    https://github.com/nodejs/node/blob/v4.8.0/deps/uv/src/unix/kqueue.c#L291
+    https://github.com/nodejs/node/blob/v4.8.0/deps/uv/src/unix/sunos.c#L287
+  Understanding this would be useful to know if and what limitation there is
+  on solution 4.
 
 - Test yargs' cases using setBlocking, e.g.
   <https://github.com/yargs/yargs/blob/8756a3c63dfd2ceae303067b46075de5c982af66/yargs.js#L1010-L1012>
