@@ -2,6 +2,8 @@
 
 ## not yet released
 
+(nothing yet)
+
 ## 1.1.1
 
 - Exclude "examples/" dir from the npm-installed package.
