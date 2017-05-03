@@ -94,7 +94,7 @@ $ node examples/hang-because-active-handle.js | grep meta
 ```
 
 If you need to support node 0.10, [here is a `softExit()`
-function](https://github.com/joyent/node-exeunt/blob/master/lib/exeunt.js#L26-56)
+function](https://github.com/joyent/node-exeunt/blob/master/lib/exeunt.js#L26-L56)
 that will use `process.exitCode` if the node version supports it, else fallback
 to `process.exit` if necessary (with the potential for truncation).
 
@@ -178,7 +178,7 @@ Pros:
 
 Cons:
 - `exeunt()` calls `process.exit()` *asynchronously* (in `setImmediate`), which
-  means need to handle code still executing. Depending on how your code is
+  means you need to handle code still executing. Depending on how your code is
   structured, that might just require calling `return;`.
 - `process.exit` is called in `setImmediate` to ensure that one more pass
   through the event loop will flush stdout/stderr. That event loop pass will
