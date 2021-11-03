@@ -1,20 +1,25 @@
 {
   "name": "exeunt",
   "description": "exiting a node.js process *and flushing stdout and stderr*",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Joyent (joyent.com)",
   "homepage": "https://github.com/joyent/node-exeunt",
-  "keywords": ["exit", "flush", "stdout", "stderr", "cli"],
+  "keywords": [
+    "exit",
+    "flush",
+    "stdout",
+    "stderr",
+    "cli"
+  ],
   "main": "./lib/exeunt.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/joyent/node-exeunt.git"
+    "url": "https://github.com/joyent/node-exeunt.git"
   },
   "engines": {
     "node": ">=0.10"
   },
   "license": "MPL-2.0",
-
   "devDependencies": {
     "eslint": "3.x"
   }
